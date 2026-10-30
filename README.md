@@ -80,3 +80,9 @@ Testes:
 - `npm run test:services:browser`: após o build, verifica os fluxos reais, histórico, importação, bloqueio de conversão duplicada, buscas/filtros/ordenação, indicadores, cancelamento/conclusão confirmados, persistência, integridade após exclusão de cliente/orçamento, troca de empresa, PDF A4 e telas 320/390 px. Usa Playwright/Chromium e utilitários Poppler, como os testes de Orçamentos. Artefatos: pasta temporária `orvelium-services-qa`, configurável por `SERVICE_TEST_OUTPUT`; porta padrão 3004, configurável por `SERVICE_TEST_PORT`.
 - Regressões: `npm run test:clients`, `npm run test:quotes`, `npm run test:quotes:browser`.
 - Verificações: `npm run typecheck` e `npm run build`.
+
+## Supabase — Etapa 1
+
+Área de conta em `/conta`, com login/cadastro por e-mail e senha, confirmação, empresas UUID, associação multiempresa, papéis, seleção ativa e RLS. Os módulos locais continuam intactos e **não usam a empresa Supabase nesta etapa**. Sem configuração, a demonstração permanece utilizável e a área de conta fica indisponível.
+
+Consulte [docs/SUPABASE.md](docs/SUPABASE.md) para variáveis (`.env.example`), aplicação das migrations versionadas, configuração do Auth/Vercel, matriz de permissões, testes e roteiro obrigatório de validação real. **Não declarar a autenticação pronta para produção antes de validar o fluxo completo contra um projeto Supabase real.**
