@@ -9,7 +9,9 @@
     "typecheck": "tsc --noEmit",
     "test:clients": "node scripts/test-clients.cjs",
     "test:quotes": "node scripts/test-quotes.cjs",
-    "test:quotes:browser": "node scripts/test-quotes-browser.cjs"
+    "test:quotes:browser": "node scripts/test-quotes-browser.cjs",
+    "test:services": "node scripts/test-services.cjs",
+    "test:services:browser": "node scripts/test-services-browser.cjs"
   },
   "dependencies": {
     "@fontsource-variable/dm-sans": "^5.3.0",
