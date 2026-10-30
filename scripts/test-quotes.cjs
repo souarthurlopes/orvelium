@@ -2,7 +2,7 @@ const { test, after } = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');const os=require('node:os');const path=require('node:path');const ts=require('typescript');
 const output=fs.mkdtempSync(path.join(os.tmpdir(),'orvelium-quotes-tests-'));
-for(const [folder,names] of [['clients',['types','local-repository']],['quotes',['types','local-repository','pdf']]]){
+for(const [folder,names] of [['clients',['types','local-repository']],['quotes',['types','local-repository','pdf']],['pdf',['base']]]){
  fs.mkdirSync(path.join(output,folder));
  for(const name of names){const source=fs.readFileSync(path.join(__dirname,`../lib/${folder}/${name}.ts`),'utf8');fs.writeFileSync(path.join(output,folder,`${name}.js`),ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2020,esModuleInterop:true}}).outputText);}
 }

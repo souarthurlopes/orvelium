@@ -19,7 +19,7 @@ Verificações: `npm run typecheck` e `npm run build`. Para executar o build: `n
 - Busca e filtro de movimentações fictícias.
 - Cadastro demonstrativo de empresas com validação de campos e troca de empresa na sessão.
 - Login demonstrativo acessível pelo perfil na base da navegação, sem autenticação ou envio de credenciais.
-- Navegação responsiva com Clientes funcional e Orçamentos integrado e módulos previstos de financeiro, estoque, serviços, funcionários e RDO.
+- Navegação responsiva com Clientes funcional e Orçamentos e Serviços/OS integrados, além dos módulos previstos de financeiro, estoque, funcionários e RDO.
 - Componentes compartilhados de marca, indicadores e apresentação de módulos.
 - Fontes Manrope e DM Sans servidas localmente, sem dependência do Google Fonts em execução.
 
@@ -57,3 +57,26 @@ O botão WhatsApp abre `wa.me` com um resumo de texto para revisão. Não envia 
 - `npm run test:clients`: regressão do repositório de Clientes.
 - `npm run typecheck` e `npm run build`.
 - Após o build, `npm run test:quotes:browser`: testes reais no Chromium de formulários, integração com Clientes, filtros, confirmações, persistência, telas 320/390 px, download e conteúdo de PDFs A4 curtos e longos (70 itens). Requer Chromium (`npx playwright install chromium` ou `CHROMIUM_PATH`) e utilitários Poppler `pdfinfo`, `pdftotext`, `pdffonts`. Usa um contexto de navegador novo e dados fictícios. `QUOTE_TEST_PORT` muda a porta 3003; `QUOTE_TEST_OUTPUT` muda a pasta de artefatos (padrão: diretório temporário `orvelium-quotes-qa`).
+
+## Serviços e ordens de serviço (OS)
+
+O módulo Serviços agora permite abrir OS manualmente com um cliente existente ou converter um orçamento aprovado. Não há restrição de segmento: título, descrição/escopo, tipo de serviço e responsável são textos livres. Responsável ainda não está vinculado a Funcionários. O formulário inclui prioridade, abertura, início/conclusão previstos, valor previsto em centavos, até 100 itens/materiais opcionais e observações internas. Quantidades usam milésimos; preços e subtotais reutilizam as regras inteiras dos orçamentos. O valor previsto é independente do subtotal dos itens; ao converter orçamento, recebe o valor líquido dos descontos.
+
+A listagem tem pesquisa por número, serviço, tipo, cliente histórico e responsável; filtros de cliente/status/prazo/atraso e ordenação por data de abertura. Prazo filtra a conclusão prevista, com extremos inclusivos. Indicadores consideram todas as OS da empresa: abertas (Pendente, Em andamento e Pausada), Em andamento, Atrasadas e Concluídas. Atraso significa conclusão prevista anterior ao dia atual em America/Sao_Paulo e status ainda não encerrado. O próprio dia do prazo não é atrasado. Canceladas e Concluídas não contam como atraso atual.
+
+Transições: Pendente → Em andamento ou Cancelada; Em andamento → Pausada, Concluída ou Cancelada; Pausada → Em andamento ou Cancelada. Concluída e Cancelada são terminais nesta versão, sem edição, reabertura ou exclusão de OS. Encerramentos exigem confirmação adicional. Cada mudança requer data e observação; datas não podem estar no futuro ou ser anteriores à última ocorrência de status. A primeira data de início é preservada ao pausar/retomar. A abertura fica fixa após o cadastro. A edição de planejamento registra automaticamente campos alterados, incluindo datas, responsável, cliente, valor e itens. O histórico guarda data de ocorrência e de gravação, sem apresentar autoria autenticada ou trilha inviolável.
+
+A conversão verifica aprovação e revisão do orçamento no repositório existente. Número, identificador, revisão e cópia integral do orçamento ficam preservados na OS. Cada orçamento pode originar somente uma OS, inclusive se cancelada; o formulário e o repositório bloqueiam duplicidade. Alterar/excluir o orçamento ou o cliente não apaga nem atualiza automaticamente os dados históricos da OS. Os cadastros originais nunca são duplicados. Uma OS de orçamento mantém o cliente de origem fixo. Uma OS manual pode trocar de cliente enquanto aberta; a mudança registra dados anteriores e posteriores no histórico. Manter o mesmo cliente conserva os dados históricos já salvos, inclusive após sua exclusão do cadastro.
+
+Arquivos: `lib/services/types.ts` define contratos assíncronos; `rules.ts` contém validação, filtros, indicadores, transições e importação; `local-repository.ts` implementa persistência; `pdf.ts` gera PDF. A interface em `components/services/` separa listagem, formulário, status e detalhes. A base local Manrope/logo do PDF foi extraída para `lib/pdf/base.ts` e reutilizada pelos dois módulos; os PDFs de Orçamentos têm teste de regressão.
+
+Persistência usa `orvelium.services.v1:<nome-da-empresa-codificado>`, com numeração, revisão e histórico no mesmo documento local. Erros de armazenamento não confirmam gravações; dados inválidos são preservados e bloqueiam alterações. Web Locks serializa as gravações de OS entre abas quando disponível; sem essa API, gravações concorrentes podem se sobrepor. Há verificação de revisão para impedir edição desatualizada. Não há transação atômica conjunta entre Clientes, Orçamentos e OS. A futura integração Supabase deverá adicionar IDs de empresa estáveis, autenticação real, permissões/RLS, constraints únicas e transações. A separação por nome de empresa não constitui segurança. O cadastro demonstrativo de empresas ainda só retém nomes durante a sessão; recriar/selecionar o mesmo nome acessa a mesma coleção local.
+
+PDF A4 disponível nos detalhes: inclui logo, Manrope incorporada, empresa/cliente disponíveis, escopo, itens, datas, valor previsto, origem e histórico. **Inclui observações internas:** revise antes de compartilhar. Não é assinado, não confirma execução real nem envia nada automaticamente. Não movimenta estoque, gera pagamentos, e-mails ou automações externas.
+
+Testes:
+
+- `npm run test:services`: 14 testes automatizados de criação, validação, importação aprovada, duplicidade inclusive concorrente/cancelada, vínculos históricos, edição, transições, cancelamento, filtros, atrasos, indicadores, persistência, revisões, isolamento por empresa e falhas de armazenamento.
+- `npm run test:services:browser`: após o build, verifica os fluxos reais, histórico, importação, bloqueio de conversão duplicada, buscas/filtros/ordenação, indicadores, cancelamento/conclusão confirmados, persistência, integridade após exclusão de cliente/orçamento, troca de empresa, PDF A4 e telas 320/390 px. Usa Playwright/Chromium e utilitários Poppler, como os testes de Orçamentos. Artefatos: pasta temporária `orvelium-services-qa`, configurável por `SERVICE_TEST_OUTPUT`; porta padrão 3004, configurável por `SERVICE_TEST_PORT`.
+- Regressões: `npm run test:clients`, `npm run test:quotes`, `npm run test:quotes:browser`.
+- Verificações: `npm run typecheck` e `npm run build`.
