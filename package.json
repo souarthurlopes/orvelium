@@ -11,11 +11,17 @@
     "test:quotes": "node scripts/test-quotes.cjs",
     "test:quotes:browser": "node scripts/test-quotes-browser.cjs",
     "test:services": "node scripts/test-services.cjs",
-    "test:services:browser": "node scripts/test-services-browser.cjs"
+    "test:services:browser": "node scripts/test-services-browser.cjs",
+    "test:supabase": "node scripts/test-supabase.cjs",
+    "test:supabase:config": "node scripts/test-supabase-config.cjs",
+    "test:supabase:remote": "node scripts/test-supabase-remote.cjs",
+    "test:supabase:browser": "node scripts/test-supabase-browser.cjs"
   },
   "dependencies": {
     "@fontsource-variable/dm-sans": "^5.3.0",
     "@fontsource-variable/manrope": "^5.3.0",
+    "@supabase/ssr": "^0.12.7",
+    "@supabase/supabase-js": "^2.118.0",
     "jspdf": "^4.2.1",
     "jspdf-autotable": "^5.0.9",
     "lucide-react": "^0.468.0",
@@ -24,6 +30,7 @@
     "react-dom": "^19.1.0"
   },
   "devDependencies": {
+    "@electric-sql/pglite": "^0.5.13",
     "@tailwindcss/postcss": "^4.1.0",
     "@types/node": "^22.0.0",
     "@types/react": "^19.0.0",
