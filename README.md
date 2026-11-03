@@ -2,6 +2,14 @@
 
 Primeira interface demonstrativa de um SaaS de gestão empresarial, construída de forma independente com Next.js, TypeScript e Tailwind CSS. Trilha foi consultado exclusivamente como referência de linguagem visual (tons neutros, tipografia e organização em cartões), sem reutilização de código, navegação ou regras de negócio.
 
+## Ambientes e autenticação
+
+A entrada `/` encaminha para `/painel`, que exige usuário confirmado verificado no servidor e vínculo atual com a empresa UUID ativa. Sem sessão, o destino é `/conta/entrar`; sem empresa ativa, `/conta/empresas`. O painel usa apenas o contexto do Supabase e não apresenta indicadores operacionais enquanto esses módulos não estiverem conectados ao banco.
+
+A demonstração está exclusivamente em `/demo`, com identificação visual e os módulos locais existentes. Seus dados não são importados nem utilizados no painel autenticado. Os trechos abaixo sobre indicadores e armazenamento local descrevem essa demonstração.
+
+Callbacks distinguem links expirados (`otp_expired`), validam o usuário após a confirmação e encaminham para criação/seleção de empresas. A entrada real usa o layout dividido oficial e oferece cadastro, confirmação de senha, reenvio e recuperação em `/conta/recuperar` e `/conta/nova-senha`. A mensagem de expiração não prova uma sessão válida.
+
 ## Desenvolvimento
 
 Requer Node.js 22 ou 24 e npm. Execute na raiz do repositório:

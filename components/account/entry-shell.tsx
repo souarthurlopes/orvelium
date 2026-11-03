@@ -1,0 +1,5 @@
+import Link from 'next/link';
+import { Logo } from '@/components/ui';
+export function EntryShell({children}:{children:React.ReactNode}){
+ return <main className="login auth-entry"><section className="login-art"><Logo light/><div><span className="eyebrow">MENOS COMPLEXIDADE. MAIS CLAREZA.</span><h1>Seu negócio.<br/>Uma nova<br/><span>perspectiva.</span></h1><p>Tudo o que importa para a sua gestão,<br/>conectado em um só lugar.</p><div className="orbit" aria-hidden="true"><div/><div/><div/></div></div><small>© 2026 Orvelium One</small></section><section className="login-form"><div className="mobile-brand"><Logo/></div>{children}<nav className="entry-options" aria-label="Opções de acesso"><Link href="/conta/entrar">Entrar na minha conta</Link><Link href="/conta/cadastro">Criar uma conta</Link><Link href="/demo">Acessar demonstração</Link></nav><p className="form-note">A demonstração é um ambiente independente com dados fictícios, sem autenticação real.</p><div className="login-foot">Gestão inteligente começa com uma visão clara.</div></section></main>;
+}

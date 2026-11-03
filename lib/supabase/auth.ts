@@ -4,7 +4,8 @@ import { supabaseConfigured } from './config';
 import { createClient } from './server';
 export async function requireAccount(){
   if(!supabaseConfigured())redirect('/conta/entrar');
-  const supabase=await createClient();
+  const supabase=await createClient().catch(()=>null);
+  if(!supabase)redirect('/conta/entrar');
   const verified=await supabase.auth.getUser().catch(()=>null);
   if(!verified)redirect('/conta/entrar');
   const {data:{user},error}=verified;
@@ -26,4 +27,18 @@ export async function accountContext(){
   const active=available.find(c=>c.id===preference.data?.active_company_id)??null;
   const role=ownMemberships.find(m=>m.company_id===active?.id)?.role??null;
   return{user,supabase,profile:profile.data,companies:available,memberships:ownMemberships,active,role,failed};
+}
+
+/** Never authorize a company from a display name or the preference alone. */
+export async function requireCompany(){
+  let context;
+  try { context=await accountContext(); }
+  catch(error){
+    // Preserve Next.js redirects; other failures must not render company data.
+    if(error instanceof Error && 'digest' in error)throw error;
+    redirect('/conta/entrar?status=acesso-indisponivel');
+  }
+  if(context.failed)redirect('/conta/empresas?status=acesso-indisponivel');
+  if(!context.active||!context.role)redirect('/conta/empresas');
+  return {...context,active:context.active,role:context.role};
 }

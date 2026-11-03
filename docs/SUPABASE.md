@@ -4,7 +4,7 @@
 
 Integração inicial com `@supabase/supabase-js` e `@supabase/ssr`, autenticação de e-mail/senha por Server Actions, confirmação de e-mail, sessão SSR, perfis, empresas, vínculos e empresa ativa. **Não considerar pronta para produção sem aplicar as migrations e validar o roteiro completo em um projeto Supabase real.** Os testes locais SQL não substituem GoTrue, PostgREST, entrega de e-mail, cookies, refresh ou Vercel.
 
-A demonstração em `/` permanece disponível. Clientes, Orçamentos e Serviços continuam em `localStorage`, sem migração ou troca de repositório. A empresa ativa da conta **não filtra, protege ou sincroniza esses cadastros locais**. Não existe autenticação fictícia apresentada como real: a tela antiga continua demonstrativa; a nova área `/conta` usa exclusivamente o Supabase configurado. A navegação inclui o link “Área de conta”.
+A demonstração em `/demo` permanece disponível. Clientes, Orçamentos e Serviços continuam em `localStorage`, sem migração ou troca de repositório. A empresa ativa da conta **não filtra, protege ou sincroniza esses cadastros locais**. Não existe autenticação fictícia apresentada como real: a tela antiga continua demonstrativa; a nova área `/conta` usa exclusivamente o Supabase configurado. A navegação inclui o link “Área de conta”.
 
 ## Variáveis e instalação
 
@@ -67,7 +67,7 @@ O arquivo atual é um contrato tipado manual para estas migrations, não uma ale
 O segundo fluxo permite confirmação em outro navegador/dispositivo. Os endpoints usam destinos internos fixos e ignoram `next` externo. Links/códigos/tokens nunca devem ser registrados em logs. Os retornos inválidos não ecoam tokens.
 
 5. Verifique as restrições do serviço de e-mail do projeto (destinatários, limites e SMTP). Configure SMTP próprio no painel antes de depender de entrega em produção; credenciais de SMTP não pertencem ao app.
-6. Revise limites de requisição, política de senhas e demais opções do Auth no projeto real. Recuperação de senha, convites por e-mail, MFA e troca de proprietário não foram implementados nesta etapa.
+6. Revise limites de requisição, política de senhas e demais opções do Auth no projeto real. Recuperação de senha e reenvio estão disponíveis; convites por e-mail, MFA e troca de proprietário continuam fora do escopo.
 
 ## Modelo de dados e autorização
 
@@ -100,7 +100,7 @@ Todas as tabelas expostas têm RLS. Não há política `USING (true)` para todos
 
 ## Sessão e interface
 
-Rotas públicas: `/conta/entrar`, `/conta/cadastro` e callbacks. `/conta` e `/conta/empresas` verificam o usuário no servidor com `auth.getUser()`, além da autorização no banco. O middleware renova cookies somente nas rotas de conta/retorno de Auth; a demonstração local não depende dele. Não se autoriza usuário com `getSession()` ou conteúdo de cookie não verificado. Cookies usam `SameSite=Lax` e `Secure` na origem HTTPS configurada (desenvolvimento HTTP local fica sem Secure). Rotas de conta são dinâmicas, privadas e sem cache público; links de Auth não propagam referrer.
+Rotas públicas: `/conta/entrar`, `/conta/cadastro` e callbacks. `/conta` e `/conta/empresas` verificam o usuário no servidor com `auth.getUser()`, além da autorização no banco. O middleware renova cookies nas rotas do painel, de conta e de retorno de Auth; a demonstração local não depende dele. Não se autoriza usuário com `getSession()` ou conteúdo de cookie não verificado. Cookies usam `SameSite=Lax` e `Secure` na origem HTTPS configurada (desenvolvimento HTTP local fica sem Secure). Rotas de conta são dinâmicas, privadas e sem cache público; links de Auth não propagam referrer.
 
 Após confirmação/login, o usuário cria empresa ou seleciona seus vínculos. A seleção persiste no banco por usuário. A área mostra UUIDs distintos para empresas de nomes iguais. O logout encerra a sessão deste navegador (`scope: local`), não todas as sessões de outros dispositivos.
 
@@ -152,3 +152,42 @@ npm run test:supabase:remote
 Além das variáveis públicas, ele requer `SUPABASE_TEST_OWNER_EMAIL`, `SUPABASE_TEST_OWNER_PASSWORD`, `SUPABASE_TEST_MEMBER_EMAIL`, `SUPABASE_TEST_MEMBER_PASSWORD`, `SUPABASE_TEST_OUTSIDER_EMAIL` e `SUPABASE_TEST_OUTSIDER_PASSWORD`, configuradas somente em ambiente seguro de testes. Nunca forneça senhas no chat nem as versione. O script não aceita chave privilegiada e não imprime tokens/senhas/e-mails. Sem pré-requisitos, termina com código 2 e “NÃO EXECUTADO”, sem simular aprovação.
 
 O teste remoto cria duas empresas fictícias `QA Orvelium ...` e associações para verificar login, RLS, RPCs e papéis. Ele informa os UUIDs para inspeção/limpeza administrativa posterior; não apaga contas nem empresas automaticamente. Use um projeto dedicado e usuários distintos. **Esse script ainda não substitui os passos manuais de cadastro/confirmação, cookies SSR, refresh e deploy.** Registre os resultados do roteiro completo antes de declarar prontidão de produção.
+
+## Transição para o ambiente autenticado
+
+`/` redireciona para `/painel`. O painel verifica `auth.getUser()`, e-mail confirmado, consultas sem erros, empresa ativa e vínculo atual. Ausência/falha de sessão leva ao login; ausência de empresa/vínculo leva à seleção. Falhas de consulta bloqueiam o painel. A seleção ativa sozinha não autoriza acesso: RLS e os vínculos do usuário continuam necessários. A troca de empresa usa `set_active_company` e redireciona para uma nova renderização do painel sem cache público. O logout continua encerrando a sessão local antes de redirecionar.
+
+O painel exibe o nome/UUID/papel reais e estados sem indicadores disponíveis. Não consulta `localStorage`, não presume tabelas operacionais existentes e não apresenta zeros como contagens verificadas. Clientes, Orçamentos e OS continuam preservados na demonstração `/demo`. Não há migração automática entre os ambientes.
+
+Os callbacks PKCE/token hash só encaminham para `/conta/empresas` após confirmação sem erro e `getUser()` com usuário confirmado. A recuperação de senha tem destino próprio em `/conta/nova-senha`. `otp_expired` (na resposta ou query) tem mensagem específica; falhas em fragmentos da URL são tratadas na tela de login e removidas da URL. Destinos externos e descrições fornecidas pelo provedor não são refletidos. Um link expirado ou já usado não significa autenticação válida; quem já confirmou pode entrar com senha.
+
+`npm run test:auth-boundaries` verifica os caminhos de sessão ausente/expirada, usuário sem/com empresa, falhas de banco/Auth, seleção autorizada, callbacks, logout e conteúdo do painel com dependências simuladas. Não substitui o teste do Supabase hospedado. O teste de navegador verifica a entrada protegida, demonstração explícita e links expirados. Para produção, valide login, confirmação, refresh, troca de empresa e logout reais no deploy; nenhuma migration remota faz parte destes testes.
+
+## Entrada oficial, reenvio e recuperação de senha
+
+`/conta/entrar` e `/conta/cadastro` reutilizam o layout dividido oficial: marca branca e frase institucional à esquerda, formulários à direita. Ambas apresentam entrar, criar conta e acessar `/demo`. A demonstração não possui mais formulário de login simulado; seu acesso à conta leva ao login real. Cadastro exige nome, e-mail, senha e confirmação, com validação no servidor e no formulário. Reenvio fica no login, aberto automaticamente para confirmação inválida/expirada. Respostas de envio são genéricas para evitar confirmar a existência de contas.
+
+`/conta/recuperar` solicita `resetPasswordForEmail` com retorno fixo `/auth/callback?flow=recovery`. O callback PKCE troca o código por sessão e valida `getUser()`. O endpoint `/auth/confirm` também aceita token hash `type=recovery`. Só depois dessa validação é emitido um marcador HttpOnly/SameSite=Lax (Secure em HTTPS), vinculado ao UUID do usuário e com validade de 15 minutos. `/conta/nova-senha` e sua Server Action exigem sessão confirmada e esse marcador. O marcador sozinho não autentica ninguém. Senha/confirmacão são validadas novamente no servidor; após atualizar, o marcador é removido e a sessão local é encerrada pelo SDK, encaminhando ao login. Links inválidos/expirados voltam à recuperação com nova solicitação disponível. Abrir o dashboard nunca confirma e-mail.
+
+### Configuração manual necessária no projeto Supabase
+
+1. Em Auth > Providers, habilite Email, confirmação de e-mail e senha mínima de 12 caracteres. Mantenha `NEXTPUBLICSITEURL` igual à origem HTTPS real do app e ao Site URL do Supabase.
+2. Em Auth > URL Configuration, autorize explicitamente `https://SEU-DOMINIO/auth/callback`, `https://SEU-DOMINIO/auth/callback?flow=recovery` e `https://SEU-DOMINIO/auth/confirm`; inclua equivalentes localhost somente para desenvolvimento. Use um projeto de testes para previews e configure sua própria origem, sem curingas globais.
+3. Para confirmar em outro navegador/dispositivo sem depender do verifier PKCE original, configure o template **Confirm signup** com:
+
+```html
+<a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email">Confirmar meu e-mail</a>
+```
+
+4. Configure o template **Reset password** com:
+
+```html
+<a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=recovery">Cadastrar nova senha</a>
+```
+
+Esses templates usam a origem cadastrada como Site URL. Não substitua por um endereço de demonstração ou outro deploy. O fluxo alternativo PKCE suporta os templates padrão que usam `{{ .ConfirmationURL }}`, desde que os redirects acima estejam autorizados; nesse caso, use o navegador que iniciou a solicitação.
+
+5. Revise o prazo de expiração dos e-mails, os limites de reenvio/recuperação, destinatários permitidos e o SMTP. Links são de uso único: use o mais recente, não reutilize um já consumido. Revise scanners de segurança e rastreamento de cliques do provedor que possam consumir ou reescrever links. Não exponha token hashes/códigos em logs ou ferramentas de análise.
+6. O tratamento de `otp_expired` no app permite recuperar o fluxo, mas não corrige sozinho templates, SMTP, expiração ou links já consumidos. Não foi possível inspecionar essas configurações remotas nesta tarefa. Valide com contas próprias em um projeto de testes: cadastro, entrega, confirmação no mesmo/outro navegador, reenvio, login/logout, recuperação, uso único, links expirados, refresh e seleção de empresa no deploy real.
+
+Nenhuma migration é necessária para estes fluxos. As tabelas, RLS, associação do proprietário e RPCs existentes permanecem intactas. Testes automatizados de Auth usam doubles do SDK: verificam os contratos e as negativas, sem comprovar entrega de e-mail ou funcionamento do Supabase hospedado.
