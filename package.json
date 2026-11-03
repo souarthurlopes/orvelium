@@ -12,6 +12,7 @@
     "test:quotes:browser": "node scripts/test-quotes-browser.cjs",
     "test:services": "node scripts/test-services.cjs",
     "test:services:browser": "node scripts/test-services-browser.cjs",
+    "test:workspace:browser": "node scripts/test-workspace-browser.cjs",
     "test:auth-boundaries": "node scripts/test-auth-boundaries.cjs",
     "test:supabase": "node scripts/test-supabase.cjs",
     "test:supabase:config": "node scripts/test-supabase-config.cjs",

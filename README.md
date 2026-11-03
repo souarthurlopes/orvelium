@@ -6,6 +6,8 @@ Primeira interface demonstrativa de um SaaS de gestão empresarial, construída 
 
 A entrada `/` encaminha para `/painel`, que exige usuário confirmado verificado no servidor e vínculo atual com a empresa UUID ativa. Sem sessão, o destino é `/conta/entrar`; sem empresa ativa, `/conta/empresas`. O painel usa apenas o contexto do Supabase e não apresenta indicadores operacionais enquanto esses módulos não estiverem conectados ao banco.
 
+O painel autenticado usa o menu lateral, cabeçalho, tipografia e cartões da plataforma. A navegação dos módulos é servida em `/painel?modulo=...`, sempre após verificar a conta e o vínculo com a empresa ativa. Módulos ainda indisponíveis não carregam os repositórios locais nem exibem métricas fictícias. A troca de empresa usa a seleção existente no Supabase.
+
 A demonstração está exclusivamente em `/demo`, com identificação visual e os módulos locais existentes. Seus dados não são importados nem utilizados no painel autenticado. Os trechos abaixo sobre indicadores e armazenamento local descrevem essa demonstração.
 
 Callbacks distinguem links expirados (`otp_expired`), validam o usuário após a confirmação e encaminham para criação/seleção de empresas. A entrada real usa o layout dividido oficial e oferece cadastro, confirmação de senha, reenvio e recuperação em `/conta/recuperar` e `/conta/nova-senha`. A mensagem de expiração não prova uma sessão válida.

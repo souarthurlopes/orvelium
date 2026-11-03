@@ -191,3 +191,11 @@ Esses templates usam a origem cadastrada como Site URL. Não substitua por um en
 6. O tratamento de `otp_expired` no app permite recuperar o fluxo, mas não corrige sozinho templates, SMTP, expiração ou links já consumidos. Não foi possível inspecionar essas configurações remotas nesta tarefa. Valide com contas próprias em um projeto de testes: cadastro, entrega, confirmação no mesmo/outro navegador, reenvio, login/logout, recuperação, uso único, links expirados, refresh e seleção de empresa no deploy real.
 
 Nenhuma migration é necessária para estes fluxos. As tabelas, RLS, associação do proprietário e RPCs existentes permanecem intactas. Testes automatizados de Auth usam doubles do SDK: verificam os contratos e as negativas, sem comprovar entrega de e-mail ou funcionamento do Supabase hospedado.
+
+## Navegação visual do painel
+
+`components/workspace/` reúne o menu lateral responsivo e os módulos de navegação do ambiente autenticado. A página `/painel` verifica `requireCompany()` em cada acesso, inclusive com `?modulo=clientes`, `financeiro`, `estoque`, `orcamentos`, `servicos`, `funcionarios` ou `rdo`. O shell recebe somente nome/UUID das empresas autorizadas, nome de exibição e papel; não recebe tokens ou credenciais. A empresa selecionada identifica a renderização e reinicia o estado do shell ao trocar de UUID. Selecionar empresa continua usando a RPC e Server Action existentes; não há seleção por nome ou novo armazenamento local.
+
+As métricas mostram travessão e indisponibilidade, sem supor que ausência de integração significa saldo ou contagem zero. Os módulos ainda não integrados apresentam estados próprios; `/demo` e seus repositórios locais permanecem separados. O layout reutiliza as classes, fontes e logo existentes.
+
+Após `npm run build`, `npm run test:workspace:browser` exercita os componentes reais do painel em uma fixture temporária fora do aplicativo, com Auth e formulários simulados. Verifica oito destinos de navegação, troca da empresa exibida, métricas vazias, ausência de leitura de dados locais/demonstrativos, menu móvel, Escape e larguras 320/390 px. A fixture não altera rotas de produção nem comprova autenticação real ou a RPC de troca: esses contratos têm os testes separados de autorização.

@@ -62,14 +62,20 @@ test('authenticated dashboard renders only the selected real company and no loca
   const {default:Dashboard}=load('app/painel/page.tsx',{
    'react/jsx-runtime':require('react/jsx-runtime'),
    'next/link':{default:({href,children})=>React.createElement('a',{href},children)},
-   '@/components/account/shell':{AccountShell:({children})=>React.createElement('main',null,children)},
+   'lucide-react':require('lucide-react'),
+   '@/components/workspace/modules':load('components/workspace/modules.ts',{'lucide-react':require('lucide-react')}),
+   '@/components/workspace/shell':{WorkspaceShell:({children,company,fullName,role})=>React.createElement('main',{'data-company':company.id},React.createElement('header',null,company.name+' '+fullName+' '+role),children)},
    '@/components/account/forms':{SelectCompanyForm:()=>null},
    '@/lib/supabase/auth':{requireCompany:async()=>context},
   });
-  const html=renderToStaticMarkup(await Dashboard());
+  const html=renderToStaticMarkup(await Dashboard({searchParams:Promise.resolve({})}));
   assert.ok(html.includes(context.active.name));assert.ok(html.includes(active));
   for(const value of ['Studio Orvelium','DADOS FICTÍCIOS','48.250','128','localStorage','Empresa real '+(active==='company-a'?'B':'A')])assert.ok(!html.includes(value),value);
-  assert.ok(html.includes('Nenhuma contagem está disponível'));
+  assert.ok(html.includes('Clientes ativos: indisponível'));
+  const clients=renderToStaticMarkup(await Dashboard({searchParams:Promise.resolve({modulo:'clientes'})}));
+  assert.ok(clients.includes('Nenhuma contagem está disponível'));
+  assert.ok(clients.includes('Clientes na sua empresa'));
+  assert.ok(!clients.includes('Novo cliente'));
  }
 });
 function actionFixture(){
