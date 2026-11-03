@@ -4,9 +4,9 @@ Primeira interface demonstrativa de um SaaS de gestão empresarial, construída 
 
 ## Ambientes e autenticação
 
-A entrada `/` encaminha para `/painel`, que exige usuário confirmado verificado no servidor e vínculo atual com a empresa UUID ativa. Sem sessão, o destino é `/conta/entrar`; sem empresa ativa, `/conta/empresas`. O painel usa apenas o contexto do Supabase e não apresenta indicadores operacionais enquanto esses módulos não estiverem conectados ao banco.
+A entrada `/` encaminha para `/painel`, que exige usuário confirmado verificado no servidor e vínculo atual com a empresa UUID ativa. Sem sessão, o destino é `/conta/entrar`; sem empresa ativa, `/conta/empresas`. O painel usa o contexto do Supabase, exibe a contagem real de clientes ativos quando disponível e mantém os indicadores financeiros indisponíveis enquanto seu módulo não estiver integrado.
 
-O painel autenticado usa o menu lateral, cabeçalho, tipografia e cartões da plataforma. A navegação dos módulos é servida em `/painel?modulo=...`, sempre após verificar a conta e o vínculo com a empresa ativa. Módulos ainda indisponíveis não carregam os repositórios locais nem exibem métricas fictícias. A troca de empresa usa a seleção existente no Supabase.
+O painel autenticado usa o menu lateral, cabeçalho, tipografia e cartões da plataforma. A navegação dos módulos é servida em `/painel?modulo=...`, sempre após verificar a conta e o vínculo com a empresa ativa. Clientes possui cadastro remoto; os demais módulos ainda indisponíveis não carregam os repositórios locais nem exibem métricas fictícias. A troca de empresa usa a seleção existente no Supabase.
 
 A demonstração está exclusivamente em `/demo`, com identificação visual e os módulos locais existentes. Seus dados não são importados nem utilizados no painel autenticado. Os trechos abaixo sobre indicadores e armazenamento local descrevem essa demonstração.
 
@@ -36,6 +36,8 @@ Verificações: `npm run typecheck` e `npm run build`. Para executar o build: `n
 Todos os nomes, valores e atividades são fictícios. O cadastro de empresas permanece apenas na memória da página e é descartado ao recarregar; os indicadores são exemplos fixos, inclusive ao trocar de empresa. Os módulos previstos não executam operações reais. Não há backend, pagamentos, IA ou integrações externas. Nenhuma senha é armazenada.
 
 ## Módulo Clientes
+
+No ambiente autenticado, `/painel?modulo=clientes` usa o repositório Supabase, com persistência por empresa UUID, autorização no servidor e RLS. A instalação depende somente da nova migration incremental de Clientes. Consulte [Clientes no Supabase](docs/CLIENTES_SUPABASE.md) para permissões, testes e aplicação pelo SQL Editor, sem reaplicar as duas migrations iniciais. Não há importação automática. Os parágrafos a seguir descrevem o modo local da demonstração.
 
 Cadastro PF/PJ, edição, detalhes e exclusão com confirmação. Pesquisa por nome (sem distinção de acentos), CPF/CNPJ ou telefone; filtros combinados de tipo e situação. Nome e documento são obrigatórios; contato, localização e observações são opcionais. A validação de CPF/CNPJ confere somente formato e quantidade de dígitos para permitir documentos fictícios, sem consulta cadastral.
 

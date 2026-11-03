@@ -64,6 +64,8 @@ test('authenticated dashboard renders only the selected real company and no loca
    'next/link':{default:({href,children})=>React.createElement('a',{href},children)},
    'lucide-react':require('lucide-react'),
    '@/components/workspace/modules':load('components/workspace/modules.ts',{'lucide-react':require('lucide-react')}),
+   '@/components/clients/remote-clients-module':{RemoteClientsModule:({companyId,companyName,role})=>React.createElement('section',{'data-remote-company':companyId},'Clientes remotos '+companyName+' '+role)},
+   '@/lib/clients/supabase-repository':{countActiveClients:async()=>null},
    '@/components/workspace/shell':{WorkspaceShell:({children,company,fullName,role})=>React.createElement('main',{'data-company':company.id},React.createElement('header',null,company.name+' '+fullName+' '+role),children)},
    '@/components/account/forms':{SelectCompanyForm:()=>null},
    '@/lib/supabase/auth':{requireCompany:async()=>context},
@@ -73,8 +75,8 @@ test('authenticated dashboard renders only the selected real company and no loca
   for(const value of ['Studio Orvelium','DADOS FICTÍCIOS','48.250','128','localStorage','Empresa real '+(active==='company-a'?'B':'A')])assert.ok(!html.includes(value),value);
   assert.ok(html.includes('Clientes ativos: indisponível'));
   const clients=renderToStaticMarkup(await Dashboard({searchParams:Promise.resolve({modulo:'clientes'})}));
-  assert.ok(clients.includes('Nenhuma contagem está disponível'));
-  assert.ok(clients.includes('Clientes na sua empresa'));
+  assert.ok(clients.includes('Clientes remotos '+context.active.name));
+  assert.ok(clients.includes('data-remote-company="'+active+'"'));
   assert.ok(!clients.includes('Novo cliente'));
  }
 });

@@ -41,10 +41,10 @@ export function normalizeClient(input: ClientInput): ClientInput {
 export function validateClient(input: ClientInput): string | null {
   if (!['individual', 'company'].includes(input.type) || !['active', 'inactive'].includes(input.status)) return 'Selecione um tipo e uma situação válidos.';
   if (!input.name.trim() || input.name.length > 120) return 'Informe um nome de até 120 caracteres.';
-  if (!/^[0-9\s./-]+$/.test(input.document) || digits(input.document).length !== (input.type === 'individual' ? 11 : 14)) return `Informe um ${input.type === 'individual' ? 'CPF com 11' : 'CNPJ com 14'} dígitos fictícios.`;
-  if (input.phone && !/^[0-9 ()+.-]+$/.test(input.phone)) return 'Informe um telefone fictício válido.';
+  if (!/^[0-9\s./-]+$/.test(input.document) || digits(input.document).length !== (input.type === 'individual' ? 11 : 14)) return `Informe um ${input.type === 'individual' ? 'CPF com 11' : 'CNPJ com 14'} dígitos.`;
+  if (input.phone && !/^[0-9 ()+.-]+$/.test(input.phone)) return 'Informe um telefone válido.';
   if (input.phone && ![10, 11].includes(digits(input.phone).length)) return 'O telefone deve ter DDD e 10 ou 11 dígitos.';
-  if (input.email && (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.email) || input.email.length > 160)) return 'Informe um e-mail de exemplo válido.';
+  if (input.email && (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.email) || input.email.length > 160)) return 'Informe um e-mail válido.';
   if (input.state && !states.includes(input.state)) return 'Selecione um estado válido.';
   if (input.address.length > 200 || input.city.length > 80 || input.notes.length > 2000) return 'Revise o tamanho do endereço, cidade ou observações.';
   return null;

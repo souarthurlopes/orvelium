@@ -7,6 +7,8 @@
     "build": "next build",
     "start": "next start --hostname 0.0.0.0",
     "typecheck": "tsc --noEmit",
+    "test:clients:actions": "node scripts/test-client-actions.cjs",
+    "test:clients:supabase": "node scripts/test-clients-supabase.cjs",
     "test:clients": "node scripts/test-clients.cjs",
     "test:quotes": "node scripts/test-quotes.cjs",
     "test:quotes:browser": "node scripts/test-quotes-browser.cjs",

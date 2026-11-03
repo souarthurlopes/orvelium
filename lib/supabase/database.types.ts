@@ -1,4 +1,4 @@
-// Stage 1 schema contract. Regenerate with `supabase gen types typescript --linked`
+// Schema contract for the identity/company and clients migrations. Regenerate with `supabase gen types typescript --linked`
 // after applying migrations to a real test project, and review changes.
 export type CompanyRole = 'owner' | 'admin' | 'member' | 'viewer';
 export type CompanyPermission = 'company.read' | 'company.update' | 'members.read' | 'members.manage' | 'roles.grant';
@@ -6,10 +6,13 @@ type Profile = { id:string; full_name:string; created_at:string; updated_at:stri
 type Company = { id:string; name:string; legal_name:string|null; created_by:string; created_at:string; updated_at:string }
 type Membership = { id:string; company_id:string; user_id:string; role:CompanyRole; created_at:string; updated_at:string }
 type Preference = { user_id:string; active_company_id:string|null; updated_at:string }
+export type ClientRow = { id:string; company_id:string; type:'individual'|'company'; status:'active'|'inactive'; name:string; document:string; phone:string; email:string; address:string; city:string; state:string; notes:string; created_by:string|null; created_at:string; updated_at:string }
+export type ClientWrite = Pick<ClientRow,'type'|'status'|'name'|'document'|'phone'|'email'|'address'|'city'|'state'|'notes'>;
 type Table<Row,Insert,Update> = { Row:Row; Insert:Insert; Update:Update; Relationships:[] };
 export interface Database {
   public: {
     Tables: {
+      clients: Table<ClientRow,ClientWrite & {company_id:string},Partial<ClientWrite>>;
       profiles: Table<Profile,{id:string;full_name?:string},{full_name?:string}>;
       companies: Table<Company,{name:string;created_by:string;legal_name?:string|null},{name?:string;legal_name?:string|null}>;
       company_memberships: Table<Membership,{company_id:string;user_id:string;role?:CompanyRole},{role?:CompanyRole}>;
