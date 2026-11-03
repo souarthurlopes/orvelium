@@ -17,7 +17,7 @@ export function parseSupabaseConfig(env:Environment):SupabaseConfig|null {
   if((site.protocol!=='https:'&&!(['localhost','127.0.0.1'].includes(site.hostname)&&site.protocol==='http:'))||site.username||site.password||site.search||site.hash||site.pathname!=='/')throw new Error('Use somente a origem HTTPS da aplicação, sem caminho.');
   return{url:url.origin,publishableKey:key,siteUrl:site.origin};
 }
-export function getSupabaseConfig(){if(process.env.NODE_ENV==='production'&&(process.env.NEXT_PUBLIC_SUPABASE_URL||process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY)&&!process.env.NEXT_PUBLIC_SITE_URL)throw new Error('Configure a origem pública da aplicação antes de ativar a conta.');return parseSupabaseConfig({url:process.env.NEXT_PUBLIC_SUPABASE_URL,key:process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,siteUrl:process.env.NEXT_PUBLIC_SITE_URL});}
+export function getSupabaseConfig(){if(process.env.NODE_ENV==='production'&&(process.env.NEXTPUBLICSUPABASEURL||process.env.NEXTPUBLICSUPABASEPUBLISHABLEKEY)&&!process.env.NEXTPUBLICSITEURL)throw new Error('Configure a origem pública da aplicação antes de ativar a conta.');return parseSupabaseConfig({url:process.env.NEXTPUBLICSUPABASEURL,key:process.env.NEXTPUBLICSUPABASEPUBLISHABLEKEY,siteUrl:process.env.NEXTPUBLICSITEURL});}
 export function supabaseConfigured(){try{return !!getSupabaseConfig();}catch{return false;}}
 export function isUuid(value:unknown):value is string{return typeof value==='string'&&/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value);}
 

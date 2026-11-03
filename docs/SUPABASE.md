@@ -12,15 +12,17 @@ Use Node 22/24 e `npm ci`. Copie `.env.example` para `.env.local`, que não é v
 
 | Nome | Valor |
 | --- | --- |
-| `NEXT_PUBLIC_SUPABASE_URL` | Origem HTTPS pública do projeto Supabase, sem caminhos ou credenciais |
-| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Chave pública `sb_publishable_...`; aceita também a chave legada `anon` |
-| `NEXT_PUBLIC_SITE_URL` | Origem exata da aplicação: `http://localhost:3000` em desenvolvimento ou domínio HTTPS no deploy |
+| `NEXTPUBLICSUPABASEURL` | Origem HTTPS pública do projeto Supabase, sem caminhos ou credenciais |
+| `NEXTPUBLICSUPABASEPUBLISHABLEKEY` | Chave pública `sb_publishable_...`; aceita também a chave legada `anon` |
+| `NEXTPUBLICSITEURL` | Origem exata da aplicação: `http://localhost:3000` em desenvolvimento ou domínio HTTPS no deploy |
 
-Nunca use `sb_secret_...`, `service_role`, senha do banco ou token de administração em variáveis `NEXT_PUBLIC_*`, arquivos do frontend ou commits. O preflight do `next.config.ts` rejeita chaves privilegiadas antes da compilação; os clientes também validam a configuração sem imprimir valores. Uma chave pública não é uma autorização administrativa: todas as operações autenticadas usam RLS/RPCs com o JWT do próprio usuário.
+Nunca use `sb_secret_...`, `service_role`, senha do banco ou token de administração nas três variáveis públicas acima, arquivos do frontend ou commits. O preflight do `next.config.ts` rejeita chaves privilegiadas antes da compilação; os clientes também validam a configuração sem imprimir valores. Uma chave pública não é uma autorização administrativa: todas as operações autenticadas usam RLS/RPCs com o JWT do próprio usuário.
+
+Os nomes usados na Vercel não têm o prefixo automático `NEXT_PUBLIC_`. O `next.config.ts` expõe explicitamente apenas essas três variáveis ao navegador, depois de validar a configuração. Seus valores são públicos e incorporados no build; nunca coloque credenciais privilegiadas nelas.
 
 No ambiente de nuvem com rede restrita, autorize também o hostname HTTPS exato do projeto Supabase nas configurações de rede; variáveis não concedem acesso de rede automaticamente. Não amplie a lista para todos os projetos.
 
-Sem configuração, a demonstração funciona e a área de conta fica explicitamente indisponível. Se configurar Supabase no build de produção, `NEXT_PUBLIC_SITE_URL` é obrigatória. Após alterar variáveis públicas, reinicie o desenvolvimento ou gere novo build/redeploy; salvar configuração não muda um bundle já compilado.
+Sem configuração, a demonstração funciona e a área de conta fica explicitamente indisponível. Se configurar Supabase no build de produção, `NEXTPUBLICSITEURL` é obrigatória. Após alterar variáveis públicas, reinicie o desenvolvimento ou gere novo build/redeploy; salvar configuração não muda um bundle já compilado.
 
 ## Aplicar as migrations no projeto de testes
 
@@ -106,7 +108,7 @@ Após confirmação/login, o usuário cria empresa ou seleciona seus vínculos. 
 
 1. Importe o repositório com o framework **Next.js**, raiz do projeto, instalação `npm ci` e build `npm run build`.
 2. Cadastre as três variáveis públicas nas configurações da Vercel, separadas por Development/Preview/Production. Use projeto Supabase de teste para Preview; não reutilize dados reais para testes.
-3. `NEXT_PUBLIC_SITE_URL` deve ser a origem HTTPS exata do deploy correspondente. Cadastre essa mesma origem e os redirects no painel Supabase. Para previews, prefira domínios explícitos autorizados em vez de curingas abertos.
+3. `NEXTPUBLICSITEURL` deve ser a origem HTTPS exata do deploy correspondente. Cadastre essa mesma origem e os redirects no painel Supabase. Para previews, prefira domínios explícitos autorizados em vez de curingas abertos.
 4. Faça novo deploy após mudar variáveis. Não configure `service_role`, senha do banco ou `SUPABASE_ACCESS_TOKEN` como variáveis públicas.
 5. Aplique as migrations pelo canal administrativo, não durante `next build`. O app usa apenas a chave pública e sessões de usuários.
 6. Valide cadastro, e-mail, retorno, login, expiração/refresh, seleção de empresas, autorização e logout no domínio real antes de liberar uso de produção.

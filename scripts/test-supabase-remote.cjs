@@ -1,13 +1,13 @@
 // Optional integration against a dedicated REAL Supabase test project.
 // No service role is accepted. Test users must already have confirmed e-mail.
 const {createClient}=require('@supabase/supabase-js');const assert=require('node:assert/strict');
-const required=['NEXT_PUBLIC_SUPABASE_URL','NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY','SUPABASE_TEST_OWNER_EMAIL','SUPABASE_TEST_OWNER_PASSWORD','SUPABASE_TEST_MEMBER_EMAIL','SUPABASE_TEST_MEMBER_PASSWORD','SUPABASE_TEST_OUTSIDER_EMAIL','SUPABASE_TEST_OUTSIDER_PASSWORD'];
+const required=['NEXTPUBLICSUPABASEURL','NEXTPUBLICSUPABASEPUBLISHABLEKEY','SUPABASE_TEST_OWNER_EMAIL','SUPABASE_TEST_OWNER_PASSWORD','SUPABASE_TEST_MEMBER_EMAIL','SUPABASE_TEST_MEMBER_PASSWORD','SUPABASE_TEST_OUTSIDER_EMAIL','SUPABASE_TEST_OUTSIDER_PASSWORD'];
 const missing=required.filter(name=>!process.env[name]);
 if(missing.length){console.error('NÃO EXECUTADO: configure as variáveis do projeto e três contas confirmadas de teste: '+missing.join(', '));process.exit(2);}
-const key=process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+const key=process.env.NEXTPUBLICSUPABASEPUBLISHABLEKEY;
 let allowed=key.startsWith('sb_publishable_');if(!allowed){try{allowed=JSON.parse(Buffer.from(key.split('.')[1],'base64url')).role==='anon';}catch{}}
 if(!allowed){console.error('NÃO EXECUTADO: somente chave pública publishable/anon é permitida.');process.exit(2);}
-const client=()=>createClient(process.env.NEXT_PUBLIC_SUPABASE_URL,key,{auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false}});
+const client=()=>createClient(process.env.NEXTPUBLICSUPABASEURL,key,{auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false}});
 (async()=>{const owner=client(),member=client(),outsider=client();const clients=[owner,member,outsider];const names=['OWNER','MEMBER','OUTSIDER'];let company,other;
 try{
  for(let index=0;index<clients.length;index++){const prefix='SUPABASE_TEST_'+names[index];const result=await clients[index].auth.signInWithPassword({email:process.env[prefix+'_EMAIL'],password:process.env[prefix+'_PASSWORD']});assert.ok(!result.error&&result.data.user?.email_confirmed_at,'Login verificado de conta de teste falhou. Não imprima credenciais.');}
