@@ -2,6 +2,8 @@
 
 ## Estado e limites desta entrega
 
+**Próxima integração — Orçamentos:** o código remoto e a migration incremental estão preparados conforme [ORCAMENTOS_SUPABASE.md](ORCAMENTOS_SUPABASE.md). O responsável confirmou aplicação manual e auditoria da migration de Orçamentos (a divergência CRLF/LF foi esclarecida). Não reaplique nenhuma migration. A publicação do código e a validação funcional hospedada ainda estão pendentes. Serviços/OS continua exclusivamente local.
+
 **Atualização — Clientes:** o painel autenticado agora possui integração de Clientes com PostgreSQL/RLS por UUID e contagem real de clientes ativos. A migration nova está documentada em [CLIENTES_SUPABASE.md](CLIENTES_SUPABASE.md); o responsável informou sua execução manual neste projeto, portanto não a reaplique. As seções históricas abaixo descrevem a base inicial; Orçamentos e Serviços continuam locais na demonstração. O CRUD real, a persistência após novo login e o isolamento no deploy continuam pendentes de validação; não há execução automática de migrations.
 
 Integração inicial com `@supabase/supabase-js` e `@supabase/ssr`, autenticação de e-mail/senha por Server Actions, confirmação de e-mail, sessão SSR, perfis, empresas, vínculos e empresa ativa. **Não considerar pronta para produção sem aplicar as migrations e validar o roteiro completo em um projeto Supabase real.** Os testes locais SQL não substituem GoTrue, PostgREST, entrega de e-mail, cookies, refresh ou Vercel.

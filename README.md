@@ -6,7 +6,7 @@ Primeira interface demonstrativa de um SaaS de gestão empresarial, construída 
 
 A entrada `/` encaminha para `/painel`, que exige usuário confirmado verificado no servidor e vínculo atual com a empresa UUID ativa. Sem sessão, o destino é `/conta/entrar`; sem empresa ativa, `/conta/empresas`. O painel usa o contexto do Supabase, exibe a contagem real de clientes ativos quando disponível e mantém os indicadores financeiros indisponíveis enquanto seu módulo não estiver integrado.
 
-O painel autenticado usa o menu lateral, cabeçalho, tipografia e cartões da plataforma. A navegação dos módulos é servida em `/painel?modulo=...`, sempre após verificar a conta e o vínculo com a empresa ativa. Clientes possui cadastro remoto; os demais módulos ainda indisponíveis não carregam os repositórios locais nem exibem métricas fictícias. A troca de empresa usa a seleção existente no Supabase.
+O painel autenticado usa o menu lateral, cabeçalho, tipografia e cartões da plataforma. A navegação dos módulos é servida em `/painel?modulo=...`, sempre após verificar a conta e o vínculo com a empresa ativa. Clientes e Orçamentos possuem cadastros remotos; os demais módulos ainda indisponíveis não carregam os repositórios locais nem exibem métricas fictícias. A troca de empresa usa a seleção existente no Supabase.
 
 A demonstração está exclusivamente em `/demo`, com identificação visual e os módulos locais existentes. Seus dados não são importados nem utilizados no painel autenticado. Os trechos abaixo sobre indicadores e armazenamento local descrevem essa demonstração.
 
@@ -48,6 +48,8 @@ Arquitetura: `lib/clients/types.ts` define o contrato assíncrono `ClientReposit
 Execute `npm run test:clients` para os testes do adaptador (CRUD, persistência, isolamento por empresa, duplicidade, validação, corrupção e armazenamento bloqueado/cheio). Não há dependências adicionais de teste. Para verificar o projeto: `npm run typecheck` e `npm run build`.
 
 ## Módulo Orçamentos
+
+O painel autenticado usa os clientes reais da empresa ativa e o adaptador Supabase de Orçamentos, com gravações transacionais, RLS e revisão otimista. A migration `20261104000100_quotes.sql` foi aplicada manualmente pelo responsável e auditada; não reaplique. A publicação e a validação funcional no ambiente hospedado ainda estão pendentes. Consulte [Orçamentos no Supabase](docs/ORCAMENTOS_SUPABASE.md). Não há importação automática nem conversão para Serviços locais. Os parágrafos abaixo descrevem o modo demonstrativo, que permanece preservado.
 
 Lista, busca por número/nome histórico do cliente e filtros combinados por cliente, status e intervalo inclusivo da data da proposta. Cadastro com múltiplos itens, edição, duplicação como novo rascunho, detalhes e exclusão confirmada. A numeração é sequencial por empresa e não é reaproveitada após exclusões. Produtos/serviços são descrições livres, sem integração com estoque ou serviços nesta etapa.
 

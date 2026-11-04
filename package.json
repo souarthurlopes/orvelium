@@ -10,6 +10,8 @@
     "test:clients:actions": "node scripts/test-client-actions.cjs",
     "test:clients:supabase": "node scripts/test-clients-supabase.cjs",
     "test:clients": "node scripts/test-clients.cjs",
+    "test:quotes:actions": "node scripts/test-quote-actions.cjs",
+    "test:quotes:supabase": "node scripts/test-quotes-supabase.cjs",
     "test:quotes": "node scripts/test-quotes.cjs",
     "test:quotes:browser": "node scripts/test-quotes-browser.cjs",
     "test:services": "node scripts/test-services.cjs",

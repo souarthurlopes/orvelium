@@ -64,6 +64,7 @@ test('authenticated dashboard renders only the selected real company and no loca
    'next/link':{default:({href,children})=>React.createElement('a',{href},children)},
    'lucide-react':require('lucide-react'),
    '@/components/workspace/modules':load('components/workspace/modules.ts',{'lucide-react':require('lucide-react')}),
+   '@/components/quotes/remote-quotes-module':{RemoteQuotesModule:({companyId,companyName,role})=>React.createElement('section',{'data-quote-company':companyId},'Orçamentos remotos '+companyName+' '+role)},
    '@/components/clients/remote-clients-module':{RemoteClientsModule:({companyId,companyName,role})=>React.createElement('section',{'data-remote-company':companyId},'Clientes remotos '+companyName+' '+role)},
    '@/lib/clients/supabase-repository':{countActiveClients:async()=>null},
    '@/components/workspace/shell':{WorkspaceShell:({children,company,fullName,role})=>React.createElement('main',{'data-company':company.id},React.createElement('header',null,company.name+' '+fullName+' '+role),children)},
@@ -78,6 +79,7 @@ test('authenticated dashboard renders only the selected real company and no loca
   assert.ok(clients.includes('Clientes remotos '+context.active.name));
   assert.ok(clients.includes('data-remote-company="'+active+'"'));
   assert.ok(!clients.includes('Novo cliente'));
+  const quotes=renderToStaticMarkup(await Dashboard({searchParams:Promise.resolve({modulo:'orcamentos'})}));assert.ok(quotes.includes('Orçamentos remotos '+context.active.name));assert.ok(quotes.includes('data-quote-company="'+active+'"'));
  }
 });
 function actionFixture(){

@@ -43,7 +43,7 @@ after(async()=>{await db.close();fs.rmSync(temp,{recursive:true,force:true});});
 test('incremental migration preserves existing tables and creates RLS/least-privilege grants',async()=>{
  await db.exec(`create role anon nologin;create role authenticated nologin;create schema auth;grant usage on schema auth to anon,authenticated;create table auth.users(id uuid primary key,email_confirmed_at timestamptz,raw_user_meta_data jsonb not null default '{}'::jsonb);create function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;grant execute on function auth.uid() to anon,authenticated;`);
  const files=fs.readdirSync(path.join(__dirname,'../supabase/migrations')).filter(name=>name.endsWith('.sql')).sort();
- for(const file of files.filter(name=>name!=='20261103000100_clients.sql'))await db.exec(fs.readFileSync(path.join(__dirname,'../supabase/migrations',file),'utf8'));
+ for(const file of files.filter(name=>name<'20261103000100_clients.sql'))await db.exec(fs.readFileSync(path.join(__dirname,'../supabase/migrations',file),'utf8'));
  for(const user of [owner,other,member,viewer,pending])await db.query('insert into auth.users(id,email_confirmed_at) values($1,case when $2::boolean then now() else null end)',[user,user!==pending]);
  companyA=(await as(owner,"select public.create_company('Mesmo nome',null) as id")).rows[0].id;
  companyB=(await as(other,"select public.create_company('Mesmo nome',null) as id")).rows[0].id;
